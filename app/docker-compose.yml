@@ -1,0 +1,76 @@
+version: '3.8'
+ 
+services:
+  app:
+    build: .
+    volumes:
+      - ./app:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - neo4j
+      - langfuse
+      - langflow
+      - ollama
+      - litellm
+    environment:
+      - NEO4J_URI=${NEO4J_URI}
+      - NEO4J_USER=${NEO4J_USER}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
+      - LANGFUSE_HOST=${LANGFUSE_HOST}
+      - LANGFLOW_MODEL_OLLAMA=${LANGFLOW_MODEL_OLLAMA}
+      - LANGFLOW_API_KEY=${LANGFLOW_API_KEY}
+      - LANGFLOW_MODEL_LITELLM=${LANGFLOW_MODEL_LITELLM}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
+    env_file:
+      - .env
+ 
+  neo4j:
+    image: neo4j:5.12
+    ports:
+      - 7474:7474
+      - 7687:7687
+    environment:
+      - NEO4J_AUTH=neo4j/m00nl1ght
+    volumes:
+      - neo4j_data:/data
+ 
+  langfuse:
+    image: langfuse/langfuse:latest
+    ports:
+      - 3000:3000
+    environment:
+      - LANGFUSE_API_SECRET_KEY=sk-lf-9d4e6f10-695b-4c38-8a26-ad3e641f4bc1
+      - LANGFUSE_API_PUBLIC_KEY=pk-lf-9d4e6f10-695b-4c38-8a26-ad3e641f4bc1
+ 
+  langflow:
+    image: langflow/langflow:latest
+    ports:
+      - 7860:7860
+    environment:
+      - LANGFLOW_API_KEY=sk-U7q1NS9vVcvrCJJrV-u57Q
+ 
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 11434:11434
+    volumes:
+      - ollama_data:/root/.ollama
+ 
+  litellm:
+    image: ghcr.io/berriai/litellm:main
+    ports:
+      - 4000:4000
+    environment:
+      - LITELLM_MODEL_OLLAMA=ollama/llama3
+      - LITELLM_BASE_URL_OLLAMA=http://ollama:11434
+      - LITELLM_MODEL_LITELLM=sangria_4o
+      - LITELLM_BASE_URL_LITELLM=http://litellm:4000
+ 
+volumes:
+  neo4j_data: /media/nakula/Studies/DotKonnekt/PoCs/crewai_poc/volumes/neo4j_volumes
+  ollama_data: /media/nakula/Studies/DotKonnekt/PoCs/crewai_poc/volumes/ollama_volumes
+ 
+ 

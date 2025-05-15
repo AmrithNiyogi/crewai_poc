@@ -1,0 +1,8 @@
+crewai
+langflow
+langfuse
+neo4j
+litellm
+openai
+python-dotenv
+ollama
